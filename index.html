@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LayerEdge Concept Games · Learn & Play zk Proofs</title>
+   <link rel="icon" type="image/LayerEdge-icon" href="le.io.jpg">
+<style>
+  /* Base reset */
+  * {
+    box-sizing: border-box;
+  }
+  body, html {
+    margin: 0; padding: 0;
+    background-color: #000000;
+    color: rgb(218, 218, 219);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden;
+  }
+  a {
+    color: rgb(218, 218, 219);
+    text-decoration: none;
+  }
+  a:hover, a:focus {
+    color: #fff;
+  }
+
+  /* Navbar */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: #000;
+    border-bottom: 1px solid rgb(50,50,50);
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    z-index: 1000;
+  }
+  nav .brand {
+    font-weight: 700;
+    font-size: 1.4rem;
+    letter-spacing: 0.07em;
+    cursor: default;
+    user-select: none;
+    text-transform: uppercase;
+    flex: 1;
+  }
+  nav .tabs {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+  }
+  nav .tabs button {
+    background: transparent;
+    border: none;
+    padding: 0.5rem 0.9rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgb(180,180,180);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    white-space: nowrap;
+  }
+  nav .tabs button.active, 
+  nav .tabs button:hover {
+    background-color: rgb(218,218,219);
+    color: #000;
+    box-shadow: 0 0 12px rgb(218,218,219);
+  }
+  nav .tabs::-webkit-scrollbar {
+    height: 6px;
+  }
+  nav .tabs::-webkit-scrollbar-thumb {
+    background: rgb(218,218,219);
+    border-radius: 3px;
+  }
+
+  /* Main */
+  main {
+    padding: 5.5rem 1rem 3rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  section.game {
+    display: none;
+  }
+  section.game.active {
+    display: block;
+    animation: fadeInEase 0.5s forwards;
+  }
+  @keyframes fadeInEase {
+    from {opacity: 0; transform: translateY(10px);}
+    to {opacity: 1; transform: translateY(0);}
+  }
+
+  /* Common styles */
+  h1,h2,h3,h4,h5,h6 {
+    font-weight: 700;
+  }
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 0.25rem;
+  }
+  h2 {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    color: rgb(200, 200, 200);
+  }
+  p {
+    line-height: 1.5;
+    margin: 0.5rem 0 1.2rem;
+    color: rgb(190,190,190);
+  }
+  button, input[type="button"], input[type="submit"] {
+    background-color: rgb(218,218,219);
+    border: none;
+    padding: 0.6rem 1.1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #000;
+    user-select: none;
+    transition: background-color 0.25s ease, box-shadow 0.3s ease;
+  }
+  button:hover, input[type="button"]:hover, input[type="submit"]:hover {
+    background-color: #fff;
+    box-shadow: 0 0 15px rgb(218, 218, 219);
+  }
+  button:disabled {
+    background-color: rgb(100,100,100);
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  input[type="text"], input[type="number"], select {
+    background: #111111;
+    border: 1px solid rgb(70,70,70);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    color: rgb(218,218,219);
+    width: 100%;
+    max-width: 280px;
+    margin-bottom: 1rem;
+    transition: border-color 0.25s ease;
+  }
+  input[type="text"]:focus, input[type="number"]:focus, select:focus {
+    border-color: rgb(218,218,219);
+    outline: none;
+  }
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    color: rgb(200,200,200);
+  }
+
+  /* Box container */
+  .box {
+    background-color: #111111;
+    padding: 1.25rem 1.75rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(218,218,219,0.1);
+    margin-bottom: 2rem;
+    position: relative;
+    transition: box-shadow 0.3s ease, transform 0.25s ease;
+  }
+  .box:hover {
+    box-shadow: 0 16px 30px rgba(218,218,219,0.25);
+    transform: translateY(-5px);
+  }
+
+  /* Cursor shadow effect on boxes */
+  .box-cursor-shadow {
+    will-change: transform, box-shadow;
+  }
+
+  /* Code style */
+  pre, code {
+    background: #222;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 0.9rem;
+    color: rgb(180, 180, 180);
+    overflow-x: auto;
+  }
+
+  /* Interactive elements */
+  .status-badge {
+    padding: 2px 12px;
+    border-radius: 14px;
+    font-weight: 700;
+    cursor: default;
+    display: inline-block;
+    text-align: center;
+    min-width: 80px;
+    user-select: none;
+  }
+  .status-true {
+    background-color: rgb(50,255,100);
+    color: black;
+    box-shadow: 0 0 10px rgb(50,255,100);
+  }
+  .status-false {
+    background-color: rgb(255,50,50);
+    color: black;
+    box-shadow: 0 0 10px rgb(255,50,50);
+  }
+  .status-pending {
+    background-color: rgb(218,218,219);
+    color: #000;
+    box-shadow: 0 0 10px rgb(218,218,219);
+  }
+
+  /* Specific game styles */
+  /* 1. Zero-Knowledge Proof Puzzle */
+
+  #zkp-puzzle input[type="text"] {
+    max-width: 320px;
+  }
+  #zkp-puzzle .message {
+    margin-top: 1rem;
+    font-weight: 600;
+  }
+  #zkp-puzzle .animation-box {
+    margin: 1.5rem auto 0 auto;
+    width: 280px;
+    height: 100px;
+    background: radial-gradient(circle at center, rgb(218,218,219) 20%, transparent 75%);
+    border-radius: 14px;
+    box-shadow: 0 0 30px rgb(218,218,219);
+    position: relative;
+    overflow: hidden;
+  }
+  #zkp-puzzle .secret-light {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: rgb(218,218,219);
+    border-radius: 50%;
+    top: 35px;
+    left: 10px;
+    filter: blur(12px);
+    animation: pulseLight 2.5s ease-in-out infinite;
+  }
+  @keyframes pulseLight {
+    0%, 100% {transform: scale(1);}
+    50% {transform: scale(1.25);}
+  }
+  #zkp-puzzle .proof-light {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    background: rgb(218,218,219);
+    border-radius: 50%;
+    top: 34px;
+    left: 240px;
+    filter: blur(10px);
+    animation: pulseProof 4s ease-in-out infinite;
+  }
+  @keyframes pulseProof {
+    0%, 100% {opacity: 0.4; transform: scale(1);}
+    50% {opacity: 1; transform: scale(1.4);}
+  }
+  #zkp-puzzle .arrow {
+    position: absolute;
+    top: 41px;
+    left: 55px;
+    width: 180px;
+    height: 19px;
+    border: 4px solid transparent;
+    border-top: 4px solid rgb(218,218,219);
+    border-bottom: 4px solid rgb(218,218,219);
+    border-radius: 12px;
+    opacity: 0.8;
+    animation: arrowMove 3s linear infinite;
+  }
+  @keyframes arrowMove {
+    0% {transform: translateX(0);}
+    100% {transform: translateX(15px);}
+  }
+
+  /* 2. Proof Aggregation Strategy Game */
+
+  #strategy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(70px,1fr));
+    gap: 10px;
+    max-width: 360px;
+    margin: 0 auto 2rem auto;
+  }
+  #strategy-grid button {
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #000;
+  }
+  #strategy-grid button.active {
+    background-color: rgb(218, 218, 219);
+    box-shadow: 0 0 12px rgb(218, 218, 219);
+  }
+  #strategy-grid button:disabled {
+    background-color: #555;
+    box-shadow: none;
+  }
+
+  #strategy-info {
+    max-width: 460px;
+    margin: 0 auto;
+    font-size: 1rem;
+    min-height: 5rem;
+    user-select: none;
+    text-align: center;
+  }
+
+  /* 3. Bitcoin Blockspace Optimizer */
+
+  #optimizer-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  #optimizer-table thead tr {
+    border-bottom: 2px solid rgb(60, 60, 60);
+  }
+  #optimizer-table thead th {
+    text-align: left;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+  #optimizer-table tbody tr {
+    border-bottom: 1px solid rgb(40, 40, 40);
+  }
+  #optimizer-table tbody tr:hover {
+    background: rgba(218, 218, 219, 0.07);
+  }
+  #optimizer-table tbody td {
+    padding: 0.45rem 1rem;
+    font-size: 0.9rem;
+  }
+  #optimizer-controls {
+    margin: 1rem 0 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    max-width: 420px;
+  }
+  #optimizer-controls label {
+    flex:1 1 100%;
+  }
+  #optimizer-controls input[type="number"] {
+    width: 100%;
+  }
+  #optimizer-run {
+    flex: 1 1 100%;
+    max-width: 140px;
+  }
+  #optimizer-message {
+    color: rgb(218,218,219);
+    font-weight: 600;
+    min-height: 1.5rem;
+  }
+
+  /* 4. Node Operator Simulation */
+
+  #node-operator-stats p {
+    font-size: 1.1rem;
+    margin: 0.5rem 0;
+    font-weight: 600;
+  }
+  #node-operator-controls {
+    margin-top: 1rem;
+  }
+  #node-operator-controls button {
+    margin-right: 1rem;
+  }
+  #node-operator-log {
+    background: #111;
+    border-radius: 12px;
+    margin-top: 1rem;
+    padding: 1rem;
+    height: 160px;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.3;
+    border: 1px solid rgb(70,70,70);
+  }
+
+  /* 5. zkProof Guessing Game */
+
+  #guess-game-question {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+  #guess-options {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+  #guess-options button {
+    min-width: 100px;
+    padding: 0.6rem 1rem;
+  }
+  #guess-feedback {
+    font-weight: 600;
+    min-height: 1.5rem;
+  }
+  #guess-next-btn {
+    margin-top: 0.7rem;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(218, 218, 219);
+    border-radius: 3px;
+  }
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand">LayerEdge Play</div>
+  <div class="tabs" role="tablist" aria-label="Games tabs">
+    <button role="tab" aria-selected="true" aria-controls="game-1" id="tab-1" tabindex="0">zk Proof Puzzle</button>
+    <button role="tab" aria-selected="false" aria-controls="game-2" id="tab-2" tabindex="-1">Aggregation Strategy</button>
+    <button role="tab" aria-selected="false" aria-controls="game-3" id="tab-3" tabindex="-1">Blockspace Optimizer</button>
+    <button role="tab" aria-selected="false" aria-controls="game-4" id="tab-4" tabindex="-1">Node Simulator</button>
+    <button role="tab" aria-selected="false" aria-controls="game-5" id="tab-5" tabindex="-1">Guessing Game</button>
+  </div>
+</nav>
+<main>
+  <!-- 1. Zero-Knowledge Proof Puzzle Game -->
+  <section class="game active" id="game-1" role="tabpanel" aria-labelledby="tab-1" tabindex="0">
+    <h1>Zero-Knowledge Proof Puzzle</h1>
+    <p>Prove you know a secret password without revealing it. Try to guess the hidden code and generate a zk proof!</p>
+    <div class="box box-cursor-shadow" id="zkp-puzzle">
+      <label for="secret-input">Enter your secret password:</label>
+      <input type="text" id="secret-input" placeholder="Type your secret here..." autocomplete="off" aria-describedby="zkp-status" />
+      <button id="zkp-submit-btn" disabled>Generate Proof</button>
+      <p class="message" id="zkp-status" aria-live="polite"></p>
+      <div class="animation-box" aria-hidden="true">
+        <div class="secret-light"></div>
+        <div class="arrow"></div>
+        <div class="proof-light"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Proof Aggregation Strategy Game -->
+  <section class="game" id="game-2" role="tabpanel" aria-labelledby="tab-2" tabindex="0">
+    <h1>Proof Aggregation Strategy</h1>
+    <p>Select nodes to batch zk proofs efficiently and minimize verification cost. Each active node gives cost discount.</p>
+    <div class="box box-cursor-shadow" id="aggregation-strategy">
+      <div id="strategy-grid" role="grid" aria-label="Node selection grid"></div>
+      <div id="strategy-info" aria-live="polite"></div>
+      <button id="strategy-submit-btn" disabled>Submit Aggregation</button>
+      <p id="strategy-result" aria-live="assertive" style="margin-top:1rem;"></p>
+    </div>
+  </section>
+
+  <!-- 3. Bitcoin Blockspace Optimizer Game -->
+  <section class="game" id="game-3" role="tabpanel" aria-labelledby="tab-3" tabindex="0">
+    <h1>Bitcoin Blockspace Optimizer</h1>
+    <p>Fill blocks with batch transactions containing zk proofs. Maximize throughput while minimizing fees.</p>
+    <div class="box box-cursor-shadow" id="blockspace-optimizer">
+      <div id="optimizer-controls">
+        <label for="tx-count">Number of transactions (10-100):</label>
+        <input type="number" id="tx-count" min="10" max="100" value="50" />
+        <label for="avg-proof-size">Avg proof size (KB) (5-50):</label>
+        <input type="number" id="avg-proof-size" min="5" max="50" value="15" />
+        <button id="optimizer-run">Run Optimization</button>
+      </div>
+      <table id="optimizer-table" aria-label="Block transactions optimization results">
+        <thead>
+          <tr>
+            <th>Block No.</th>
+            <th>Transactions</th>
+            <th>Total Proof Size (KB)</th>
+            <th>Fees (BTC)</th>
+          </tr>
+        </thead>
+        <tbody id="optimizer-tbody"></tbody>
+      </table>
+      <p id="optimizer-message" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- 4. Node Operator Simulation -->
+  <section class="game" id="game-4" role="tabpanel" aria-labelledby="tab-4" tabindex="0">
+    <h1>Node Operator Simulation</h1>
+    <p>Run your LayerEdge node: respond to proof requests, keep uptime, and verify fast to earn points!</p>
+    <div class="box box-cursor-shadow" id="node-operator">
+      <div id="node-operator-stats" aria-live="polite">
+        <p>Uptime: <strong id="node-uptime">0%</strong></p>
+        <p>Points: <strong id="node-points">0</strong></p>
+        <p>Last Response Time: <strong id="node-response-time">- ms</strong></p>
+      </div>
+      <div id="node-operator-controls">
+        <button id="start-node-btn">Start Node</button>
+        <button id="respond-proof-btn" disabled>Respond to Proof Request</button>
+        <button id="stop-node-btn" disabled>Stop Node</button>
+      </div>
+      <div id="node-operator-log" aria-live="polite" aria-atomic="true" role="log"></div>
+    </div>
+  </section>
+
+  <!-- 5. zkProof Guessing Game -->
+  <section class="game" id="game-5" role="tabpanel" aria-labelledby="tab-5" tabindex="0">
+    <h1>zkProof Guessing Game</h1>
+    <p>Try to guess if these statements are TRUE or FALSE based on zk proof hints without knowing the underlying secret!</p>
+    <div class="box box-cursor-shadow" id="guess-game">
+      <div id="guess-game-question">...</div>
+      <div id="guess-options" role="radiogroup" aria-labelledby="guess-game-question">
+        <button role="radio" aria-checked="false" id="guess-true-btn">True</button>
+        <button role="radio" aria-checked="false" id="guess-false-btn">False</button>
+      </div>
+      <div id="guess-feedback" aria-live="polite"></div>
+      <button id="guess-next-btn" disabled>Next Question</button>
+    </div>
+  </section>
+</main>
+<footer style="text-align:center; padding:1rem; font-size:0.85rem; color: rgb(140,140,140);">
+  &copy; 2024 Abdul Rehman — <a href="https://layeredge.io" target="_blank" rel="noopener noreferrer">layeredge.io</a> <a href="https://x.com/abdulrehmanonX" target="_blank" rel="noopener noreferrer">@abdulrehmanonX</a>
+</footer>
+
+<script>
+  // Tab switching logic for a11y
+  const tabs = [...document.querySelectorAll('nav .tabs button')];
+  const games = [...document.querySelectorAll('section.game')];
+  function activateTab(index) {
+    tabs.forEach((t, i) => {
+      const selected = i === index;
+      t.setAttribute('aria-selected', selected);
+      t.tabIndex = selected ? 0 : -1;
+      games[i].classList.toggle('active', selected);
+    });
+    games[index].focus();
+  }
+  tabs.forEach((tab, i) => {
+    tab.addEventListener('click', () => activateTab(i));
+    tab.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight') {
+        activateTab((i + 1) % tabs.length);
+        tabs[(i + 1) % tabs.length].focus();
+      } else if (e.key === 'ArrowLeft') {
+        activateTab((i + tabs.length - 1) % tabs.length);
+        tabs[(i + tabs.length - 1) % tabs.length].focus();
+      }
+    });
+  });
+  activateTab(0);
+
+  // Cursor shadow effect on boxes
+  function setupCursorShadow() {
+    const boxes = document.querySelectorAll('.box-cursor-shadow');
+    window.addEventListener('mousemove', e => {
+      boxes.forEach(box => {
+        const rect = box.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const cx = rect.width / 2;
+        const cy = rect.height / 2;
+        const dx = (x - cx) / cx;
+        const dy = (y - cy) / cy;
+        const shadowX = dx * 20;
+        const shadowY = dy * 20;
+        box.style.boxShadow = `
+          ${shadowX}px ${shadowY}px 40px rgba(218,218,219,0.25),
+          0 8px 20px rgba(218,218,219,0.1)
+        `;
+      });
+    });
+    boxes.forEach(box => {
+      box.addEventListener('mouseleave', () => {
+        box.style.boxShadow = '0 8px 20px rgba(218,218,219,0.1)';
+      });
+    });
+  }
+  setupCursorShadow();
+
+  // ============== 1. Zero-Knowledge Proof Puzzle ==============
+  (function(){
+    const input = document.getElementById('secret-input');
+    const submitBtn = document.getElementById('zkp-submit-btn');
+    const status = document.getElementById('zkp-status');
+
+    // The secret password simulation - in real zk is unknown to verifier but here user guesses.
+    const secretPassword = 'layeredge';
+
+    input.addEventListener('input', () => {
+      submitBtn.disabled = input.value.trim().length === 0;
+      status.textContent = '';
+    });
+
+    submitBtn.addEventListener('click', () => {
+      const guess = input.value.trim().toLowerCase();
+      if (!guess) return;
+      if (guess === secretPassword) {
+        status.innerHTML = '<span class="status-badge status-true">Proof generated! Secret verified without revealing it.</span>';
+      } else {
+        status.innerHTML = '<span class="status-badge status-false">Invalid proof! Secret does not match.</span>';
+      }
+    });
+  })();
+
+  // ============== 2. Proof Aggregation Strategy Game ==============
+  (function(){
+    const gridEl = document.getElementById('strategy-grid');
+    const infoEl = document.getElementById('strategy-info');
+    const submitBtn = document.getElementById('strategy-submit-btn');
+    const resultEl = document.getElementById('strategy-result');
+
+    const totalNodes = 15;
+    let activeNodes = new Set();
+
+    function renderGrid() {
+      gridEl.innerHTML = '';
+      for (let i=1; i<=totalNodes; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.setAttribute('aria-pressed', 'false');
+        btn.setAttribute('role', 'gridcell');
+        btn.type = 'button';
+        btn.title = `Node ${i}`;
+        btn.onclick = () => toggleNode(i, btn);
+        btn.addEventListener('keydown', e => {
+          if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            toggleNode(i, btn);
+          }
+        });
+        gridEl.appendChild(btn);
+      }
+    }
+    function toggleNode(num, btn) {
+      if (activeNodes.has(num)) {
+        activeNodes.delete(num);
+        btn.classList.remove('active');
+        btn.setAttribute('aria-pressed', 'false');
+      } else {
+        activeNodes.add(num);
+        btn.classList.add('active');
+        btn.setAttribute('aria-pressed', 'true');
+      }
+      updateInfo();
+    }
+    function updateInfo() {
+      const count = activeNodes.size;
+      if (count === 0) {
+        infoEl.textContent = "Select nodes to activate aggregation.";
+        submitBtn.disabled = true;
+        resultEl.textContent = '';
+        return;
+      }
+      const costBase = 1000;
+      // Cost decreases by 7% per active node
+      const discount = Math.min(0.07 * count, 0.75);
+      const cost = Math.round(costBase * (1 - discount));
+      infoEl.textContent = `Active Nodes: ${count} | Cost after discount: ${cost} units`;
+      submitBtn.disabled = false;
+      resultEl.textContent = '';
+    }
+    submitBtn.addEventListener('click', () => {
+      const count = activeNodes.size;
+      if (count === 0) return;
+      // Simulate aggregation result after a short delay
+      resultEl.style.color = rgbToCss(50,255,100);
+      resultEl.textContent = "Aggregating proofs across selected nodes...";
+      submitBtn.disabled = true;
+      setTimeout(() => {
+        if (Math.random() > 0.1) {
+          resultEl.style.color = rgbToCss(50,255,100);
+          resultEl.textContent = "Aggregation successful! Verification cost minimized.";
+        } else {
+          resultEl.style.color = rgbToCss(255,50,50);
+          resultEl.textContent = "Aggregation failed! Try adjusting node selection.";
+        }
+        submitBtn.disabled = false;
+      }, 2200);
+    });
+
+    function rgbToCss(r,g,b) {
+      return `rgb(${r},${g},${b})`;
+    }
+
+    renderGrid();
+    updateInfo();
+  })();
+
+  // ============== 3. Bitcoin Blockspace Optimizer Game ==============
+  (function(){
+    const txCountInput = document.getElementById('tx-count');
+    const proofSizeInput = document.getElementById('avg-proof-size');
+    const runBtn = document.getElementById('optimizer-run');
+    const tbody = document.getElementById('optimizer-tbody');
+    const messageEl = document.getElementById('optimizer-message');
+
+    const BLOCK_SIZE_LIMIT_KB = 1024; // 1MB block size for example
+
+    runBtn.addEventListener('click', () => {
+      const txCount = Number(txCountInput.value);
+      const avgProof = Number(proofSizeInput.value);
+      if (isNaN(txCount) || isNaN(avgProof) || txCount < 10 || txCount > 100 || avgProof < 5 || avgProof > 50) {
+        messageEl.textContent = 'Please enter valid ranges for transactions and proof size.';
+        return;
+      }
+      messageEl.textContent = '';
+      tbody.innerHTML = '';
+      // Calculate how to pack transactions into blocks respecting proof size limit
+      let remainingTx = txCount;
+      let blockNum = 1;
+      while (remainingTx > 0) {
+        // Max tx per block depends on avg proof size and block size limit
+        const maxProofsAllowed = Math.floor(BLOCK_SIZE_LIMIT_KB / avgProof);
+        const txThisBlock = Math.min(remainingTx, maxProofsAllowed);
+        const fees = (txThisBlock * avgProof * 0.00001).toFixed(6); // random fee example
+        const proofSizeTotal = (txThisBlock * avgProof).toFixed(2);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${blockNum}</td>
+          <td>${txThisBlock}</td>
+          <td>${proofSizeTotal}</td>
+          <td>${fees}</td>
+        `;
+        tbody.appendChild(tr);
+        remainingTx -= txThisBlock;
+        blockNum++;
+      }
+      messageEl.textContent = `Optimized ${txCount} transactions across ${blockNum-1} blocks.`;
+    });
+  })();
+
+  // ============== 4. Node Operator Simulation ==============
+  (function(){
+    const uptimeEl = document.getElementById('node-uptime');
+    const pointsEl = document.getElementById('node-points');
+    const responseEl = document.getElementById('node-response-time');
+    const logEl = document.getElementById('node-operator-log');
+    const startBtn = document.getElementById('start-node-btn');
+    const respondBtn = document.getElementById('respond-proof-btn');
+    const stopBtn = document.getElementById('stop-node-btn');
+
+    let nodeRunning = false;
+    let uptime = 0;
+    let points = 0;
+    let proofInterval = null;
+    let uptimeInterval = null;
+
+    function addLog(msg, type='info') {
+      const line = document.createElement('div');
+      line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      line.style.color = type === 'error' ? 'rgb(255,50,50)' : 'rgb(218,218,219)';
+      logEl.appendChild(line);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function startNode() {
+      if (nodeRunning) return;
+      nodeRunning = true;
+      uptime = 0;
+      points = 0;
+      uptimeEl.textContent = '0%';
+      pointsEl.textContent = '0';
+      responseEl.textContent = '- ms';
+      logEl.innerHTML = '';
+      addLog('Node started. Waiting for proof requests...');
+      startBtn.disabled = true;
+      respondBtn.disabled = false;
+      stopBtn.disabled = false;
+
+      uptimeInterval = setInterval(() => {
+        if (nodeRunning) {
+          uptime += 1;
+          if (uptime > 100) uptime = 100;
+          uptimeEl.textContent = uptime + '%';
+        }
+      }, 1000);
+    }
+    function stopNode() {
+      if (!nodeRunning) return;
+      nodeRunning = false;
+      clearInterval(uptimeInterval);
+      clearInterval(proofInterval);
+      addLog('Node stopped.');
+      startBtn.disabled = false;
+      respondBtn.disabled = true;
+      stopBtn.disabled = true;
+      responseEl.textContent = '- ms';
+    }
+    function respondProof() {
+      if (!nodeRunning) return;
+      respondBtn.disabled = true;
+      addLog('Received proof request...');
+      const responseTime = Math.floor(Math.random() * 300) + 50; // 50-350 ms
+      setTimeout(() => {
+        addLog(`Responded to proof in ${responseTime} ms`);
+        points += 10;
+        pointsEl.textContent = points;
+        responseEl.textContent = `${responseTime} ms`;
+        respondBtn.disabled = false;
+      }, responseTime);
+    }
+    startBtn.addEventListener('click', startNode);
+    stopBtn.addEventListener('click', stopNode);
+    respondBtn.addEventListener('click', respondProof);
+  })();
+
+  // ============== 5. zkProof Guessing Game ==============
+  (function(){
+    const questions = [
+      {q:'Is the secret number even?', answer:true, hint:"Proof confirms 'evenness' without revealing number."},
+      {q:'Is the secret a prime number?', answer:false, hint:"Proof rejects prime property."},
+      {q:'Is the secret greater than 100?', answer:true, hint:"Proof shows secret > 100."},
+      {q:'Is the secret a multiple of 7?', answer:false, hint:"Proof denies seven multiplicity."},
+      {q:'Is the secret between 50 and 150?', answer:true, hint:"Proof verifies secret is in this range."},
+    ];
+
+    let current = 0;
+    const questionEl = document.getElementById('guess-game-question');
+    const feedbackEl = document.getElementById('guess-feedback');
+    const trueBtn = document.getElementById('guess-true-btn');
+    const falseBtn = document.getElementById('guess-false-btn');
+    const nextBtn = document.getElementById('guess-next-btn');
+
+    function setQuestion(index) {
+      current = index;
+      const q = questions[index];
+      questionEl.textContent = q.q;
+      feedbackEl.textContent = '';
+      trueBtn.disabled = false;
+      falseBtn.disabled = false;
+      nextBtn.disabled = true;
+      // Reset aria-checked
+      trueBtn.setAttribute('aria-checked', 'false');
+      falseBtn.setAttribute('aria-checked', 'false');
+    }
+    function answerQuestion(guess) {
+      trueBtn.disabled = true;
+      falseBtn.disabled = true;
+      nextBtn.disabled = false;
+      const correct = (guess === questions[current].answer);
+      if (correct) {
+        feedbackEl.innerHTML = `<span class="status-badge status-true">Correct! ${questions[current].hint}</span>`;
+      } else {
+        feedbackEl.innerHTML = `<span class="status-badge status-false">Wrong. ${questions[current].hint}</span>`;
+      }
+    }
+    trueBtn.addEventListener('click', () => {
+      trueBtn.setAttribute('aria-checked', 'true');
+      falseBtn.setAttribute('aria-checked', 'false');
+      answerQuestion(true);
+    });
+    falseBtn.addEventListener('click', () => {
+      falseBtn.setAttribute('aria-checked', 'true');
+      trueBtn.setAttribute('aria-checked', 'false');
+      answerQuestion(false);
+    });
+    nextBtn.addEventListener('click', () => {
+      setQuestion((current + 1) % questions.length);
+    });
+    setQuestion(0);
+  })();
+
+</script>
+</body>
+</html>
+
+
